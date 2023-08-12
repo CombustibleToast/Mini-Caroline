@@ -19,9 +19,6 @@ const client = new Client({
 client.login(token);
 module.exports = { client };
 
-//create instances for loudspeakers
-const loudspeakerClients = loginLoudspeakerClients();
-
 //commands collection
 client.commands = new Collection();
 
@@ -77,17 +74,6 @@ for (const file of functionFiles) {
 //initialize cooldown collection for rate limiting, the rest is handled in interactioncreate.js
 client.cooldowns = new Collection();
 
-//compile the collection of loudspeaker clients
-loudspeakerClients.then((loudspeakerClients) => {
-    client.loudspeakers = new Collection();
-    for (const loudspeaker of loudspeakerClients) {
-        client.loudspeakers.set(loudspeaker.user.id, loudspeaker);
-        loudspeaker.parentClient = client;
-    }
-    console.log(`${loudspeakerClients.length} Loudspeakers ready`);
-},
-    (error) => console.error(`Error while logging in loudspeakers:\n${error.stack}`));
-
 //functions below
 
 function getAllNestedFiles(rootDirectory, fileList) {
@@ -99,23 +85,5 @@ function getAllNestedFiles(rootDirectory, fileList) {
         else {
             return fileList.push(filePath);
         }
-    });
-}
-
-async function loginLoudspeakerClients() {
-    return new Promise(async (resolve) => {
-        const loudspeakerClients = [];
-        for (const token of loudspeakerTokens) {
-            const loudspeakerClient = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
-            try {
-                await loudspeakerClient.login(token);
-                console.log(`Logged in loudspeaker ${loudspeakerClient.user.tag}`);
-                loudspeakerClients.push(loudspeakerClient);
-            }
-            catch (e) {
-                console.error(`Couldn't login a loudspeaker:\n${e.stack}`);
-            }
-        }
-        resolve(loudspeakerClients);
     });
 }

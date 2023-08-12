@@ -6,21 +6,21 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         //check if this iteration of the bot services this guild but allow all DMs
-        if(interaction.guild != null && interaction.guild.id != productionGuildId){
+        if (interaction.guild != null && interaction.guild.id != productionGuildId) {
             console.log(`Received a request from another guild ${interaction.guild.id}`);
             return;
         }
-        
+
         //check if the user is on cooldown
         const cooldowns = interaction.client.cooldowns;
         const userId = interaction.user.id;
-        if(cooldowns.has(userId) && userId != "122065561428426755"){
+        if (cooldowns.has(userId) && userId != "122065561428426755") {
             //user is on cooldown, reply to them as such and don't do anything else.
             console.log(`User is on cooldown: ${interaction.user.tag}`);
-            interaction.reply({content: `Please wait ${cooldownTime} second(s) between requests.`, ephemeral: true});
+            interaction.reply({ content: `Please wait ${cooldownTime} second(s) between requests.`, ephemeral: true });
             return;
         }
-        else if(userId != "122065561428426755"){
+        else if (userId != "122065561428426755") {
             //user is not on cooldown, don't stop them.
             cooldowns.set(userId, interaction);
             setTimeout(() => {
@@ -35,7 +35,7 @@ module.exports = {
             //store the command
             const command = interaction.client.commands.get(interaction.commandName);
             console.log(`${command == "pushReportForm" || command == "reportFormSubmission" ? "someone" : interaction.user.tag} is performing command ${interaction.commandName}`);
-            
+
             //do nothing if the command doesn't exist
             if (!command) {
                 console.error(`No command matching ${interaction.commandName} was found.`);
@@ -46,15 +46,20 @@ module.exports = {
             try {
                 await command.execute(interaction);
             } catch (error) {
-                console.error(error);
-                if(!interaction.replied && !interaction.deferred)
-                    await interaction.reply({ content: 'There was an error while executing your command.', ephemeral: true });
-                else
-                    await interaction.followUp({ content: 'There was an error while executing your command.', ephemeral: true });
+                console.error(`[WARN] Error in trying to execute a command:\n${error}`);
+                try {
+                    if (!interaction.replied && !interaction.deferred)
+                        await interaction.reply({ content: 'There was an error while executing your command.', ephemeral: true });
+                    else
+                        await interaction.followUp({ content: 'There was an error while executing your command.', ephemeral: true });
+                }
+                catch (error) {
+                    console.error(`[WARN] Error in trying to respond after the above error:\n${error}`);
+                }
             }
             return;
         }
-        
+
         //handle functions
         const funcName = /[a-zA-Z]+/.exec(interaction.customId)[0];
         console.log(`${interaction.user.tag} is performing function ${funcName}`);
@@ -63,7 +68,7 @@ module.exports = {
         const func = interaction.client.functions.get(funcName);
 
         //do nothing if the function doesn't exist
-        if(!func){
+        if (!func) {
             console.error(`No function with the name ${funcName}`);
             return;
         }
@@ -74,13 +79,13 @@ module.exports = {
         }
         catch (e) {
             console.error(`[WARN] Error processing function ${funcName}:\n${e.stack}`);
-            try{
-                if(!interaction.replied && !interaction.deferred)
-                    await interaction.reply({content: "There was an error processing your request.", ephemeral: true});
+            try {
+                if (!interaction.replied && !interaction.deferred)
+                    await interaction.reply({ content: "There was an error processing your request.", ephemeral: true });
                 else
-                    await interaction.followUp({content: "There was an error processing your request.", ephemeral: true});
+                    await interaction.followUp({ content: "There was an error processing your request.", ephemeral: true });
             }
-            catch(e){
+            catch (e) {
                 console.log(`[INFO] Unable to reply to user after function failure:\n${e}`);
             }
         }
