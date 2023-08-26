@@ -24,7 +24,6 @@ module.exports = {
         if (assignLoudspeakerResult.status != "already assigned" || channel.members.size != 1)
             return;
 
-        const loudspeakerClient = client.loudspeakers.get(assignLoudspeakerResult.loudspeakerId);
-        client.functions.get("destroyLoudspeaker").execute(loudspeakerClient);
+        client.functions.get("destroyLoudspeaker").execute(client);
     }
 }
