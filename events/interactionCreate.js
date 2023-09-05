@@ -11,6 +11,7 @@ module.exports = {
             return;
         }
 
+        console.log("MINI CAROLINE!!!");
         //check if the user is on cooldown
         const cooldowns = interaction.client.cooldowns;
         const userId = interaction.user.id;
@@ -34,7 +35,16 @@ module.exports = {
 
             //store the command
             const command = interaction.client.commands.get(interaction.commandName);
-            console.log(`${command == "pushReportForm" || command == "reportFormSubmission" ? "someone" : interaction.user.tag} is performing command ${interaction.commandName}`);
+
+            //only respond to me and jan for all commands except roll
+            //this is horrible code i know but i'm lazy rn lol
+            if ((interaction.commandName != 'roll' && interaction.commandName != 'psychospace')
+                && (interaction.user.id != '106941865282056192' && interaction.user.id != '122065561428426755')){
+                interaction.reply({content:"You're not authorized.", ephemeral:true});
+                return;
+            }
+
+            console.log(`${interaction.user.tag} is performing command ${interaction.commandName}`);
 
             //do nothing if the command doesn't exist
             if (!command) {
