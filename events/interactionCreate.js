@@ -38,11 +38,13 @@ module.exports = {
 
             //only respond to me and jan for all commands except roll
             //this is horrible code i know but i'm lazy rn lol
+            /*
             if ((interaction.commandName != 'roll' && interaction.commandName != 'psychospace')
                 && (interaction.user.id != '106941865282056192' && interaction.user.id != '122065561428426755')){
                 interaction.reply({content:"You're not authorized.", ephemeral:true});
                 return;
             }
+            */
 
             console.log(`${interaction.user.tag} is performing command ${interaction.commandName}`);
 
