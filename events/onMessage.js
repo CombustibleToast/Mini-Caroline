@@ -17,7 +17,6 @@ module.exports = {
 
         const triggeredFunction = client.functions.find(func => func.trigger ? func.trigger.test(message.content) : false);
 
-        console.log(`func: ${triggeredFunction}`)
         if(!triggeredFunction)
             return;
 
