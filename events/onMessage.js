@@ -1,6 +1,7 @@
 const { Events } = require('discord.js');
 const { client } = require('../index.js');
 const { productionGuildId } = require('../secrets.json');
+const { trigger } = require('../lib/otherFunctions/isCannon.js');
 
 module.exports = {
     name: Events.MessageCreate,
@@ -15,12 +16,19 @@ module.exports = {
         if(message.author.bot)
             return;
 
+        //Find a function that triggers on the message
         const triggeredFunction = client.functions.find(func => func.trigger ? func.trigger.test(message.content) : false);
 
+        //Escape if the function doesn't exist/was not found
         if(!triggeredFunction)
             return;
 
         console.log(`Processing message from ${message.author.username}: "${message.content}"`);
+
+        //Check the function's guild whitelist, ignore if this message was not sent from those guilds
+        if(triggeredFunction.guildWhitelist && !triggeredFunction.guildWhitelist.includes(message.guild.id))
+            return;
+        
         try{
             triggeredFunction.execute(message);
         }
